@@ -24,7 +24,7 @@ const App = () => {
   ])
 
   return (
-    <div>
+    <div className='bg-[#111] min-h-screen'>
       <RouterProvider router={router} />
     </div>
   )
