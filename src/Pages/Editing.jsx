@@ -1,10 +1,69 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Button from '../Components/Button';
+import FilterRange from '../Components/FilterRange';
 
 const Editing = () => {
+
+  const [filters, setFilters] = useState({
+    Brightness: {
+        value: 100,
+        min: 0,
+        max: 200,
+        unit: "%"
+    },
+    Contrast: {
+        value: 100,
+        min: 0,
+        max: 200,
+        unit: "%"
+    },
+    Saturation: {
+        value: 100,
+        min: 0,
+        max: 200,
+        unit: "%"
+    },
+    HueRotation: {
+        value: 0,
+        min: 0,
+        max: 360,
+        unit: "deg"
+    },
+    Blur: {
+        value: 0,
+        min: 0,
+        max: 20,
+        unit: "px"
+    },
+    GrayScale: {
+        value: 0,
+        min: 0,
+        max: 100,
+        unit: "%"
+    },
+    Sepia: {
+        value: 0,
+        min: 0,
+        max: 100,
+        unit: "%"
+    },
+    Opacity: {
+        value: 100,
+        min: 0,
+        max: 100,
+        unit: "%"
+    },
+    Invert: {
+        value: 0,
+        min: 0,
+        max: 100,
+        unit: "%"
+    },
+  })
+
   return (
     <main>
-      <section className='py-8 px-10'>
+      <section className='py-8 px-10 flex gap-4'>
         <div className="left w-[60%] flex flex-col gap-8 items-center">
           <div className="top flex justify-center gap-10 items-center">
             <label 
@@ -24,8 +83,21 @@ const Editing = () => {
             </div>
           </div>
         </div>
-        <div className="right w-[40%] bg-[#444] h-full">
-
+        <div className="right w-[40%] bg-[#444] mt-10 p-5">
+          <h1 className='text-3xl font-semibold tracking-wider'>Filters</h1>
+        <div className="filters p-5 flex flex-col gap-5">
+            {Object.keys(filters).map(filter => {
+              return <FilterRange 
+                        filterName={filter} 
+                        min={filters[filter].min} 
+                        max={filters[filter].max} 
+                        value={filters[filter].value} 
+                        unit={filters[filter].unit}
+                        filters={filters}
+                        setFilters={setFilters}
+                      />
+            })}
+          </div>
         </div>
       </section>
     </main>
