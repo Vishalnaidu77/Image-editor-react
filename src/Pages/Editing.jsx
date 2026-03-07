@@ -1,66 +1,12 @@
-import React, { useState } from 'react'
+import React, { use, useContext, useState } from 'react'
 import Button from '../Components/Button';
 import FilterRange from '../Components/FilterRange';
 import Canvas from '../Components/Canvas';
+import { filterDataContext } from '../Context/FilterContext';
 
 const Editing = () => {
 
-  const [filters, setFilters] = useState({
-    Brightness: {
-        value: 100,
-        min: 0,
-        max: 200,
-        unit: "%"
-    },
-    Contrast: {
-        value: 100,
-        min: 0,
-        max: 200,
-        unit: "%"
-    },
-    Saturation: {
-        value: 100,
-        min: 0,
-        max: 200,
-        unit: "%"
-    },
-    HueRotation: {
-        value: 0,
-        min: 0,
-        max: 360,
-        unit: "deg"
-    },
-    Blur: {
-        value: 0,
-        min: 0,
-        max: 20,
-        unit: "px"
-    },
-    GrayScale: {
-        value: 0,
-        min: 0,
-        max: 100,
-        unit: "%"
-    },
-    Sepia: {
-        value: 0,
-        min: 0,
-        max: 100,
-        unit: "%"
-    },
-    Opacity: {
-        value: 100,
-        min: 0,
-        max: 100,
-        unit: "%"
-    },
-    Invert: {
-        value: 0,
-        min: 0,
-        max: 100,
-        unit: "%"
-    },
-  })
+  const { filters, setFilters } = useContext(filterDataContext)
 
   const [img, setImg] = useState(null)
 
@@ -70,7 +16,7 @@ const Editing = () => {
     newImg.src = URL.createObjectURL(file)
     setImg(newImg)
   }
-
+  
   return (
     <main>
       <section className='py-4 px-10 flex gap-4'>
@@ -110,8 +56,8 @@ const Editing = () => {
         <div className="right w-[30%] bg-[#444] mt-10 p-5">
           <h1 className='text-3xl font-semibold tracking-wider'>Filters</h1>
           <div className="filters p-5 flex flex-col gap-7">
-            {Object.keys(filters).map(filter => {
-              return <FilterRange 
+            {Object.keys(filters).map((filter, idx) => {
+              return <FilterRange key={idx}
                         filterName={filter} 
                         min={filters[filter].min} 
                         max={filters[filter].max} 

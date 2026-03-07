@@ -1,6 +1,9 @@
 import React, { useState } from 'react'
 
 const FilterRange = ({ filterName, value, min, max, unit, filters, setFilters }) => {
+
+  
+
   return (
     <label className='flex flex-col gap-2 text-md font-medium'>
         {filterName}
