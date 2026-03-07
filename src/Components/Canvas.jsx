@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { filterDataContext } from '../Context/FilterContext';
 
 const Canvas = ({ img }) => {
@@ -8,7 +8,7 @@ const Canvas = ({ img }) => {
 
     const canvasRef = useRef(null)
 
-    const applyFilters = () => {
+    const applyFilters = useCallback(() => {
         const canvas = canvasRef.current
         if(!canvas || !image.current) return
 
@@ -28,7 +28,7 @@ const Canvas = ({ img }) => {
         `
         ctx.drawImage(image.current, 0 , 0)
         ctx.filter = "none"
-    }
+    }, [filters])
 
     useEffect(() => {
         const canvas = canvasRef.current
@@ -63,7 +63,12 @@ const Canvas = ({ img }) => {
 
     useEffect(() => {
         if(!canvasRef.current || !image.current) return
-        applyFilters()
+
+        const rafId = requestAnimationFrame(() => {
+            applyFilters()
+        })
+
+        return () => cancelAnimationFrame(rafId)
     }, [filters])
 
   return (
