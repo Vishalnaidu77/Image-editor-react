@@ -3,6 +3,7 @@ import Button from '../Components/Button';
 import FilterRange from '../Components/FilterRange';
 import Canvas from '../Components/Canvas';
 import { filterDataContext } from '../Context/FilterContext';
+import PresetOptions from '../Components/PresetOptions';
 
 const Editing = () => {
 
@@ -90,6 +91,8 @@ const Editing = () => {
                       />
             })}
           </div>
+          <h1 className='text-3xl font-semibold tracking-wider'>Presets</h1>
+          <PresetOptions />
         </div>
       </section>
     </main>

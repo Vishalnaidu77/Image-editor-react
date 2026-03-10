@@ -6,7 +6,6 @@ const Canvas = ({ img, onCanvasReady }) => {
     const [imgSelected, setImageSelected] = useState(false)
     const image = useRef(null);
     const canvasRef = useRef(null)
-
     const applyFilters = useCallback(() => {
         const canvas = canvasRef.current
         if(!canvas || !image.current) return
