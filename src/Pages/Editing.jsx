@@ -9,6 +9,7 @@ const Editing = () => {
   const { filters, setFilters } = useContext(filterDataContext)
 
   const [img, setImg] = useState(null)
+  const [canvasElem, setCanvasElem] = useState(null)
 
   const getFile = (e) => {
     const file = e.target.files[0]
@@ -17,8 +18,27 @@ const Editing = () => {
     setImg(newImg)
   }
 
-  
-  
+  const handleDownload = async () => {
+    if (!img || !canvasElem) return
+
+    requestAnimationFrame(async () => {
+      const blob = await new Promise((blob) => (
+        canvasElem.toBlob(blob, "image/png", 1)
+      ))
+
+      if (!blob) return;
+
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `edited-image.png`
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url)
+    })
+  }
+
   return (
     <main>
       <section className='py-4 px-10 flex gap-4'>
@@ -37,8 +57,8 @@ const Editing = () => {
                 hidden
               />
             </label>
-            <Button text="Reset" color="darkRed" resetFilters/>            
-            <Button text="Download" color="green"/>
+            <Button text="Reset" color="darkRed" resetFilters />            
+            <Button text="Download" color="green" onClick={handleDownload} />
           </div>
           <div className="bottom bg-[#444] w-full h-[80vh] aspect-[5/3] flex flex-col items-center justify-center p-8">
             <div className={`placeholder ${img ? 'hidden' : 'block'}`}>
@@ -48,7 +68,7 @@ const Editing = () => {
             {img 
               ? (
                 <div className='canvas-element h-[95%]'>
-                  <Canvas img={img}/>
+                  <Canvas img={img} onCanvasReady={setCanvasElem}/>
                 </div>
               )
               : null

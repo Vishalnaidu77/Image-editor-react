@@ -1,11 +1,10 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { filterDataContext } from '../Context/FilterContext';
 
-const Canvas = ({ img }) => {
+const Canvas = ({ img, onCanvasReady }) => {
     const {filters} = useContext(filterDataContext)
     const [imgSelected, setImageSelected] = useState(false)
     const image = useRef(null);
-
     const canvasRef = useRef(null)
 
     const applyFilters = useCallback(() => {
@@ -71,6 +70,12 @@ const Canvas = ({ img }) => {
         return () => cancelAnimationFrame(rafId)
     }, [filters])
 
+    useEffect(() => {
+        if(onCanvasReady && canvasRef.current) onCanvasReady(canvasRef.current)
+        return () => {
+            if(onCanvasReady) onCanvasReady(null)
+        };
+    }, [onCanvasReady])
   return (
     <canvas 
         ref={canvasRef} 
