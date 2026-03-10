@@ -1,4 +1,4 @@
-import React, { use, useContext, useState } from 'react'
+import React, { use, useContext, useEffect, useState } from 'react'
 import Button from '../Components/Button';
 import FilterRange from '../Components/FilterRange';
 import Canvas from '../Components/Canvas';
@@ -16,6 +16,8 @@ const Editing = () => {
     newImg.src = URL.createObjectURL(file)
     setImg(newImg)
   }
+
+  
   
   return (
     <main>
@@ -35,7 +37,7 @@ const Editing = () => {
                 hidden
               />
             </label>
-            <Button text="Reset" color="darkRed"/>            
+            <Button text="Reset" color="darkRed" resetFilters/>            
             <Button text="Download" color="green"/>
           </div>
           <div className="bottom bg-[#444] w-full h-[80vh] aspect-[5/3] flex flex-col items-center justify-center p-8">
