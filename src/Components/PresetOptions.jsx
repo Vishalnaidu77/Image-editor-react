@@ -1,12 +1,13 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { filterDataContext } from '../Context/FilterContext'
 
 const PresetOptions = () => {
 
-    const { filters, setFilters } = useContext(filterDataContext)
-    const [presetsOption, setPresetsOption] = useState(['Normal', 'Drama', 'Vintage', 'OldSchool', 'Noir', 'CoolBlue', 'WarmSunset', "Highkey"])
+    const { setFilters } = useContext(filterDataContext)
+    const presetsOption = ['Normal', 'Drama', 'Vintage', 'OldSchool', 'Noir', 'CoolBlue', 'WarmSunset', 'HighKey']
+    const [selectedPreset, setSelectedPreset] = useState('Normal')
 
-    const handlePresets = () => {
+    const handlePresets = (presetName) => {
         const presets = {
             Normal: {
                 Brightness: 100,
@@ -98,7 +99,7 @@ const PresetOptions = () => {
             },
         }
 
-        const newFilter = {
+        const newFilters = {
             Brightness: {
                 value: 100,
                 min: 0,
@@ -155,17 +156,27 @@ const PresetOptions = () => {
             },
         }
 
-        Object.keys(presets).forEach(presetsValue => {
-            Object.keys(newFilter).forEach(newFilter => {
-                
-            })
+        Object.keys(newFilters).forEach((newFilter) => {
+            newFilters[newFilter].value = presets[presetName][newFilter]
         })
+
+        setFilters(newFilters)
     }
 
-    handlePresets()
+    useEffect(() => {
+        handlePresets(selectedPreset)
+    }, [selectedPreset])
+
+    
 
   return (
-    <select name="" id="" className='w-full bg-[#fefefe] text-black py-2 px-3 mt-4 rounded font-semibold tracking-wider'>
+    <select 
+    name="preset-options" 
+    id="preset-options" 
+    value={selectedPreset}
+    onChange={(e) => setSelectedPreset(e.target.value)}
+    className='w-full bg-[#fefefe] text-black py-2 px-3 mt-4 rounded font-semibold tracking-wider'
+    >
         {presetsOption.map((presets, idx) => {
             return <option key={idx} value={presets}>{presets}</option>
         })}

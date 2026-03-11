@@ -2,6 +2,7 @@ import React, { useCallback, useContext, useEffect, useRef, useState } from 'rea
 import { filterDataContext } from '../Context/FilterContext';
 
 const Canvas = ({ img, onCanvasReady }) => {
+    
     const {filters} = useContext(filterDataContext)
     const [imgSelected, setImageSelected] = useState(false)
     const image = useRef(null);
