@@ -1,11 +1,35 @@
 @import "tailwindcss";
 
+/* Performance optimizations */
+* {
+    box-sizing: border-box;
+}
+
+/* Enable hardware acceleration for smooth animations */
+.canvas-element {
+    transform: translateZ(0);
+    will-change: contents;
+    contain: layout style paint;
+}
+
+/* Optimize canvas rendering */
+canvas {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+}
+
+/* Smooth transitions for UI elements */
+button, label, select {
+    transition: transform 0.1s ease, background-color 0.15s ease;
+}
 
 .filter-range{
     width: 100%;
     outline: none;
     margin-top: 0.25rem;
     appearance: none;
+    cursor: pointer;
+    touch-action: pan-x;
 }
 
 .filter-range::-webkit-slider-runnable-track{
@@ -22,4 +46,39 @@
     border-radius: 50%;
     background-color: red;
     margin-top: -8.5px;
+    transition: transform 0.1s ease;
+}
+
+.filter-range::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+
+.filter-range::-webkit-slider-thumb:active {
+    transform: scale(1.1);
+}
+
+/* Firefox slider styles */
+.filter-range::-moz-range-track {
+    background-color: #fff;
+    height: 3px;
+    border-radius: 2px;
+}
+
+.filter-range::-moz-range-thumb {
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: red;
+    border: none;
+    transition: transform 0.1s ease;
+}
+
+.filter-range::-moz-range-thumb:hover {
+    transform: scale(1.2);
+}
+
+/* Loading overlay */
+.loading-overlay {
+    backdrop-filter: blur(2px);
 }

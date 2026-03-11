@@ -1,88 +1,94 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
-import { filterDataContext } from '../Context/FilterContext';
+import React, { memo, useCallback, useContext, useEffect, useRef, useMemo } from 'react'
+import { filterDataContext } from '../Context/FilterContext'
+import { buildFilterString } from '../constants/filterDefaults'
 
-const Canvas = ({ img, onCanvasReady }) => {
+const Canvas = memo(({ img, onCanvasReady }) => {
+  const { filters } = useContext(filterDataContext)
+  const imageRef = useRef(null)
+  const canvasRef = useRef(null)
+  const rafIdRef = useRef(null)
+  const ctxRef = useRef(null)
+
+  // Memoize filter string to avoid recalculating on every render
+  const filterString = useMemo(() => buildFilterString(filters), [filters])
+
+  const applyFilters = useCallback(() => {
+    const canvas = canvasRef.current
+    const image = imageRef.current
+    if (!canvas || !image) return
+
+    // Reuse context reference for performance
+    if (!ctxRef.current) {
+      ctxRef.current = canvas.getContext('2d', { 
+        alpha: false,
+        willReadFrequently: false 
+      })
+    }
+    const ctx = ctxRef.current
     
-    const {filters} = useContext(filterDataContext)
-    const [imgSelected, setImageSelected] = useState(false)
-    const image = useRef(null);
-    const canvasRef = useRef(null)
-    const applyFilters = useCallback(() => {
-        const canvas = canvasRef.current
-        if(!canvas || !image.current) return
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.filter = filterString
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height)
+    ctx.filter = 'none'
+  }, [filterString])
 
-        const ctx = canvas.getContext("2d")
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
+  // Handle image loading
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
 
-        ctx.filter = `
-        brightness(${filters.Brightness.value}${filters.Brightness.unit})
-        contrast(${filters.Contrast.value}${filters.Contrast.unit})
-        saturate(${filters.Saturation.value}${filters.Saturation.unit})
-        hue-rotate(${filters.HueRotation.value}${filters.HueRotation.unit})
-        blur(${filters.Blur.value}${filters.Blur.unit})
-        grayscale(${filters.GrayScale.value}${filters.GrayScale.unit})
-        sepia(${filters.Sepia.value}${filters.Sepia.unit})
-        opacity(${filters.Opacity.value}${filters.Opacity.unit})
-        invert(${filters.Invert.value}${filters.Invert.unit})
-        `
-        ctx.drawImage(image.current, 0 , 0)
-        ctx.filter = "none"
-    }, [filters])
+    if (img) {
+      imageRef.current = img
+      canvas.width = img.width
+      canvas.height = img.height
+      ctxRef.current = null // Reset context when canvas size changes
+      applyFilters()
+    } else {
+      imageRef.current = null
+      if (ctxRef.current) {
+        ctxRef.current.clearRect(0, 0, canvas.width, canvas.height)
+      }
+    }
+  }, [img, applyFilters])
 
-    useEffect(() => {
-        const canvas = canvasRef.current
-        if(!canvas) return 
+  // Throttle filter updates using RAF for smooth 60fps rendering
+  useEffect(() => {
+    if (!canvasRef.current || !imageRef.current) return
 
-        const canvasCtx = canvas.getContext("2d")
+    // Cancel any pending frame
+    if (rafIdRef.current) {
+      cancelAnimationFrame(rafIdRef.current)
+    }
 
-        if(img){
-            setImageSelected(true)
-            const applyFilterOnLoadedImage = () => {
-                image.current = img;
-                
-                canvasRef.current.width = img.width;
-                canvasRef.current.height = img.height;
-                applyFilters()
-            }
+    rafIdRef.current = requestAnimationFrame(applyFilters)
 
-            if (img.complete) applyFilterOnLoadedImage()
-            else img.onload = applyFilterOnLoadedImage
-            
-        }
-        else{
-            setImageSelected(false)
-            image.current = null
-            canvasCtx.clearRect(0, 0, canvas.width, canvas.height)
-        }
+    return () => {
+      if (rafIdRef.current) {
+        cancelAnimationFrame(rafIdRef.current)
+      }
+    }
+  }, [filterString, applyFilters])
 
-        return () => {
-            if(img) img.onload = null
-        }
-    }, [img])
+  // Canvas ready callback
+  useEffect(() => {
+    if (onCanvasReady && canvasRef.current) {
+      onCanvasReady(canvasRef.current)
+    }
+    return () => {
+      if (onCanvasReady) onCanvasReady(null)
+    }
+  }, [onCanvasReady])
 
-    useEffect(() => {
-        if(!canvasRef.current || !image.current) return
-
-        const rafId = requestAnimationFrame(() => {
-            applyFilters()
-        })
-
-        return () => cancelAnimationFrame(rafId)
-    }, [filters])
-
-    useEffect(() => {
-        if(onCanvasReady && canvasRef.current) onCanvasReady(canvasRef.current)
-        return () => {
-            if(onCanvasReady) onCanvasReady(null)
-        };
-    }, [onCanvasReady])
   return (
-    <canvas 
-        ref={canvasRef} 
-        className={`w-full h-full`} 
-        id="canvas"
-    ></canvas>
+    <canvas
+      ref={canvasRef}
+      className="w-full h-full"
+      id="canvas"
+      style={{ imageRendering: 'high-quality' }}
+    />
   )
-}
+})
+
+Canvas.displayName = 'Canvas'
 
 export default Canvas

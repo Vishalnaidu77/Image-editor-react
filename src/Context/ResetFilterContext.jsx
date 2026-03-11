@@ -1,76 +1,24 @@
-import React, { Children, createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useCallback, useContext, useMemo } from 'react'
 import { filterDataContext } from './FilterContext'
+import { getDefaultFilters } from '../constants/filterDefaults'
 
 export const ResetFilterContextData = createContext()
 
 const ResetFilterContext = ({ children }) => {
-
-  const [resetBtn, setResetBtn] = useState(false)
   const { setFilters } = useContext(filterDataContext)
 
-    const resetFilters = () => {
-      const newFilters = {
-        Brightness: {
-            value: 100,
-            min: 0,
-            max: 200,
-            unit: "%"
-        },
-        Contrast: {
-            value: 100,
-            min: 0,
-            max: 200,
-            unit: "%"
-        },
-        Saturation: {
-            value: 100,
-            min: 0,
-            max: 200,
-            unit: "%"
-        },
-        HueRotation: {
-            value: 0,
-            min: 0,
-            max: 360,
-            unit: "deg"
-        },
-        Blur: {
-            value: 0,
-            min: 0,
-            max: 20,
-            unit: "px"
-        },
-        GrayScale: {
-            value: 0,
-            min: 0,
-            max: 100,
-            unit: "%"
-        },
-        Sepia: {
-            value: 0,
-            min: 0,
-            max: 100,
-            unit: "%"
-        },
-        Opacity: {
-            value: 100,
-            min: 0,
-            max: 100,
-            unit: "%"
-        },
-        Invert: {
-            value: 0,
-            min: 0,
-            max: 100,
-            unit: "%"
-        },
-      }
+  // Memoized reset function
+  const resetFilters = useCallback(() => {
+    setFilters(getDefaultFilters())
+  }, [setFilters])
 
-      setFilters(newFilters)
-    }
+  // Memoize context value to prevent unnecessary re-renders
+  const contextValue = useMemo(() => ({
+    resetFilters
+  }), [resetFilters])
 
   return (
-    <ResetFilterContextData.Provider value={{ resetBtn, setResetBtn, resetFilters }}>
+    <ResetFilterContextData.Provider value={contextValue}>
       {children}
     </ResetFilterContextData.Provider>
   )
